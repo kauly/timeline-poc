@@ -24,6 +24,9 @@ const graphProps = {
 export const genViz = data => {
   console.log("TCL: data", data);
   const { daysOfWeek, timesOfDay, width, padding, height } = graphProps;
+  const begin = moment("02/08/1987", "DD/MM/YYYY").startOf("day");
+  const end = moment("02/08/1987", "DD/MM/YYYY").endOf("day");
+  console.log("TCL: begin", begin.toDate(), end.toDate());
 
   const svg = d3
     .select("#viz")
@@ -31,16 +34,17 @@ export const genViz = data => {
     .attr("width", width)
     .attr("height", height);
 
+  const xScale = d3
+    .scaleTime()
+    .domain([begin, end])
+    .rangeRound([padding, width - padding])
+    .nice();
+
   const yScale = d3
     .scaleBand()
     .domain(daysOfWeek)
     .rangeRound([height - padding, padding])
     .paddingInner(0.08);
-
-  const xScale = d3
-    .scaleLinear()
-    .domain([0, 1440])
-    .rangeRound([padding, width - padding]);
 
   const colorScale = d3
     .scaleSequential()
@@ -48,29 +52,36 @@ export const genViz = data => {
       d3.min(data, d => d.total_distance),
       d3.max(data, d => d.total_distance)
     ])
-    .interpolator(d3.interpolateYlOrBr);
+    .interpolator(d3.interpolateRainbow);
 
-  const xAxis = d3.axisBottom(xScale).ticks(24);
-  //.tickFormat((d, i) => graphProps.timesOfDay[i]);
+  const xAxis = d3
+    .axisBottom(xScale)
+    .ticks(d3.timeHour, 4)
+    .tickFormat(d3.timeFormat("%H:%M"));
 
   const yAxis = d3.axisLeft(yScale).ticks(daysOfWeek.length + 1);
 
   const resetTime = d =>
     moment(d)
-      .year(2019)
-      .month(10)
-      .date(12);
+      .year(1987)
+      .month(7)
+      .date(2)
+      .toDate();
 
-  const xAcc = d => xScale(moment(d.begin_at).get("hour") * 60);
-  const yAcc = d => yScale(moment(d.begin_at).format("ddd"));
-  const wiAcc = d => {
-    const initTime = resetTime(d.begin_at);
-    const finalTime = resetTime(d.end_at);
-    const deltaTime = finalTime.diff(initTime, "minutes");
-    console.log("TCL: deltaTime", deltaTime);
-    return xScale(deltaTime);
-  };
   const colorAcc = d => colorScale(d.total_distance);
+  const genPoints = d => {
+    const start = xScale(resetTime(d.begin_at));
+    const end = xScale(resetTime(d.end_at));
+    const y = yScale(moment(d.begin_at).format("ddd"));
+    const yPlusBd = y + yScale.bandwidth();
+    const points = {
+      p_1: `${start},${y}`,
+      p_2: `${end},${y}`,
+      p_3: `${end},${yPlusBd}`,
+      p_4: `${start},${yPlusBd}`
+    };
+    return `${points.p_1} ${points.p_2} ${points.p_3} ${points.p_4}`;
+  };
   svg
     .append("g")
     .attr("id", "x-axis")
@@ -88,12 +99,10 @@ export const genViz = data => {
     .selectAll("rect")
     .data(data)
     .enter()
-    .append("rect")
-    .attr("x", xAcc)
-    .attr("y", yAcc)
-    .attr("height", yScale.bandwidth())
-    .attr("width", wiAcc)
+    .append("polyline")
+    .attr("points", genPoints)
     .attr("fill", colorAcc)
+
     .append("title")
     .text(
       d =>
