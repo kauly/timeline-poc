@@ -16,7 +16,11 @@ const App = props => {
     data && genViz(data);
   }, [data]);
 
-  return <div ref={containerRef} id="viz" className="container" />;
+  return (
+    <div className="container">
+      <div ref={containerRef} id="viz" />
+    </div>
+  );
 };
 
 export default App;

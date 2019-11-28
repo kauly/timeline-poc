@@ -2581,6 +2581,109 @@ export const data = {
           mileage: 5168351
         }
       ]
+    },
+    {
+      id: 135120689,
+      begin_at: "2019-11-08 00:02:56",
+      end_at: "2019-11-08 03:59:25",
+      begin_reference_point: {
+        lat: -27.585019,
+        lng: -48.60708,
+        address: "Rua Guatemala, Barreiros, São José, SC, 88117-240, Brasil",
+        name: "Giassi Supermercado oioi",
+        distance: "0"
+      },
+      end_reference_point: {
+        lat: -27.599338,
+        lng: -48.605955,
+        address:
+          "iTER Telecomunicações, 23, Avenida Josué Di Bernardi, Campinas, São José, SC, 88101-200, Brasil",
+        name: "iTER Telecomunicações",
+        distance: "0"
+      },
+      total_distance: 1.85,
+      total_fuel_cost: null,
+      drivers: "",
+      begin_at_address: {
+        lat: -27.585019,
+        lng: -48.60708,
+        address: "Rua Guatemala, Barreiros, São José, SC, 88117-240, Brasil",
+        name: "Giassi Supermercado oioi",
+        distance: "0"
+      },
+      end_at_address: {
+        lat: -27.599338,
+        lng: -48.605955,
+        address:
+          "iTER Telecomunicações, 23, Avenida Josué Di Bernardi, Campinas, São José, SC, 88101-200, Brasil",
+        name: "iTER Telecomunicações",
+        distance: "0"
+      },
+      idle_time: 2142,
+      top_speed: 42,
+      top_speed_message: {
+        id: 1573229108,
+        uin: 205148048,
+        lat: "-27.589356",
+        lng: "-48.606217",
+        speed: 42,
+        gps_time: "2019-11-08T13:05:07.000-03:00",
+        mileage: 5167210,
+        ignition: true,
+        protocol: 8220,
+        driver_id: null
+      },
+      duration: 329,
+      messages: [
+        {
+          gps_time: "2019-11-08T13:02:56.000-03:00",
+          speed: 0,
+          ignition: true,
+          mileage: 5166501
+        },
+        {
+          gps_time: "2019-11-08T13:03:16.000-03:00",
+          speed: 2,
+          ignition: true,
+          mileage: 5166517
+        },
+        {
+          gps_time: "2019-11-08T13:04:23.000-03:00",
+          speed: 11,
+          ignition: true,
+          mileage: 5166743
+        },
+        {
+          gps_time: "2019-11-08T13:04:55.000-03:00",
+          speed: 20,
+          ignition: true,
+          mileage: 5167085
+        },
+        {
+          gps_time: "2019-11-08T13:05:07.000-03:00",
+          speed: 42,
+          ignition: true,
+          mileage: 5167210
+        },
+        {
+          gps_time: "2019-11-08T13:07:19.000-03:00",
+          speed: 31,
+          ignition: true,
+          mileage: 5168130
+        },
+        {
+          gps_time: "2019-11-08T13:07:45.000-03:00",
+          speed: 5,
+          ignition: true,
+          mileage: 5168328
+        },
+        {
+          gps_time: "2019-11-08T13:08:25.000-03:00",
+          speed: 0,
+          ignition: false,
+          mileage: 5168351
+        }
+      ]
     }
   ],
   resume: {

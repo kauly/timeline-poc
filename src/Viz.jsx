@@ -1,6 +1,6 @@
 import * as d3 from "d3";
-
 import moment from "moment";
+
 moment.locale("pt-br");
 
 const graphProps = {
@@ -18,28 +18,64 @@ const graphProps = {
     "18:00 PM",
     "21:00 PM",
     "23:59 PM"
-  ]
+  ],
+  types: ["weird", "move", "stop"],
+  colors: ["#eb4d4b", "#6ab04c", "#f0932b"]
+};
+
+const resetTime = d =>
+  moment(d)
+    .year(1987)
+    .month(7)
+    .date(2)
+    .toDate();
+
+const begin = moment("02/08/1987", "DD/MM/YYYY").startOf("day");
+const end = moment("02/08/1987", "DD/MM/YYYY").endOf("day");
+
+const genPoints = (d, scaleX, scaleY) => {
+  const x_1 = scaleX(resetTime(d.begin_at));
+  const x_2 = scaleX(resetTime(d.end_at));
+  const y_1 =
+    scaleY(moment(d.begin_at).format("ddd")) - scaleY.bandwidth() * 0.5 - 2;
+  const y_2 = y_1 + scaleY.bandwidth();
+  const points = {
+    p_1: `${x_1},${y_1}`,
+    p_2: `${x_2},${y_1}`,
+    p_3: `${x_2},${y_2}`,
+    p_4: `${x_1},${y_2}`,
+    p_5: `${x_1},${y_1}`
+  };
+  return {
+    points,
+    coord: `${points.p_1} ${points.p_2} ${points.p_3} ${points.p_4} ${points.p_5}`
+  };
 };
 
 export const genViz = data => {
   console.log("TCL: data", data);
-  const { daysOfWeek, timesOfDay, width, padding, height } = graphProps;
-  const begin = moment("02/08/1987", "DD/MM/YYYY").startOf("day");
-  const end = moment("02/08/1987", "DD/MM/YYYY").endOf("day");
-  console.log("TCL: begin", begin.toDate(), end.toDate());
+  const { daysOfWeek, colors, width, padding, height, types } = graphProps;
 
+  const tooltip = d3
+    .select("#viz")
+    .append("div")
+    .style("opacity", 0)
+    .attr("id", "tooltip");
   const svg = d3
     .select("#viz")
     .append("svg")
     .attr("width", width)
-    .attr("height", height);
+    .attr("height", height)
+    .on("click", function() {
+      tooltip.style("opacity", 0);
+    });
 
+  // SCALES
   const xScale = d3
     .scaleTime()
     .domain([begin, end])
-    .rangeRound([padding, width - padding])
+    .range([padding, width - padding])
     .nice();
-
   const yScale = d3
     .scaleBand()
     .domain(daysOfWeek)
@@ -47,67 +83,111 @@ export const genViz = data => {
     .paddingInner(0.08);
 
   const colorScale = d3
-    .scaleSequential()
-    .domain([
-      d3.min(data, d => d.total_distance),
-      d3.max(data, d => d.total_distance)
-    ])
-    .interpolator(d3.interpolateRainbow);
+    .scaleOrdinal()
+    .domain(types)
+    .range(colors);
 
-  const xAxis = d3
-    .axisBottom(xScale)
-    .ticks(d3.timeHour, 4)
-    .tickFormat(d3.timeFormat("%H:%M"));
+  const clipPath = svg
+    .append("defs")
+    .append("clipPath")
+    .attr("id", "clip")
+    .append("rect")
+    .attr("width", width - padding * 2)
+    .attr("x", xScale.range()[0])
+    .attr("height", height - padding);
 
-  const yAxis = d3.axisLeft(yScale).ticks(daysOfWeek.length + 1);
+  const xAxis = d3.axisBottom(xScale).tickFormat(d3.timeFormat("%H:%M"));
+  const yAxis = d3.axisLeft(yScale).ticks(8);
 
-  const resetTime = d =>
-    moment(d)
-      .year(1987)
-      .month(7)
-      .date(2)
-      .toDate();
+  const colorAcc = d => colorScale(d.type);
 
-  const colorAcc = d => colorScale(d.total_distance);
-  const genPoints = d => {
-    const start = xScale(resetTime(d.begin_at));
-    const end = xScale(resetTime(d.end_at));
-    const y = yScale(moment(d.begin_at).format("ddd"));
-    const yPlusBd = y + yScale.bandwidth();
-    const points = {
-      p_1: `${start},${y}`,
-      p_2: `${end},${y}`,
-      p_3: `${end},${yPlusBd}`,
-      p_4: `${start},${yPlusBd}`
-    };
-    return `${points.p_1} ${points.p_2} ${points.p_3} ${points.p_4}`;
-  };
-  svg
+  const gX = svg
     .append("g")
     .attr("id", "x-axis")
     .attr("transform", `translate(0, ${height - padding})`)
     .call(xAxis);
-  svg
+
+  const gY = svg
     .append("g")
     .attr("id", "y-axis")
-    .attr("transform", `translate(${padding})`)
-    .call(yAxis);
+    .attr("transform", `translate(${padding}, 0)`)
+    .call(yAxis)
+    .call(g => g.select(".domain").remove())
+    .call(g =>
+      g
+        .selectAll(".tick line")
+        .attr("stroke-opacity", 0.5)
+        .attr("stroke-dasharray", "2,2")
+        .attr("x2", xScale.range()[1] - padding)
+    )
+    .call(g =>
+      g
+        .selectAll(".tick text")
 
-  svg
+        .attr("dy", -4)
+    );
+
+  const chartData = svg
     .append("g")
     .attr("id", "bars-group")
+    .attr("clip-path", "url(#clip)")
     .selectAll("rect")
     .data(data)
     .enter()
     .append("polyline")
-    .attr("points", genPoints)
+    .attr("points", d => genPoints(d, xScale, yScale).coord)
     .attr("fill", colorAcc)
+    .on("mouseover", function(d) {
+      d3.select(this)
+        .transition()
+        .attr("cursor", "pointer")
+        .attr("stroke", "#000")
+        .attr("stroke-width", 1);
+      tooltip
+        .style("opacity", 0.9)
+        .html(
+          `${moment(d.begin_at).format("hh:mm:ss")} <br/> ${moment(
+            d.end_at
+          ).format("hh:mm:ss")}`
+        )
+        .style(
+          "top",
+          `${this.getBoundingClientRect().top - yScale.bandwidth() * 2}px`
+        )
+        .style(
+          "left",
+          `${this.getBoundingClientRect().left +
+            this.getBoundingClientRect().width}px`
+        );
+    })
+    .on("mouseout", function() {
+      d3.select(this)
+        .transition()
+        .attr("stroke-width", 0);
+    });
 
-    .append("title")
-    .text(
-      d =>
-        `${moment(d.begin_at).format("hh:mm:ss")} - ${moment(d.end_at).format(
-          "hh:mm:ss"
-        )}`
-    );
+  const zoomed = () => {
+    const evTransform = d3.event.transform;
+    const newXscale = evTransform.rescaleX(xScale);
+    gX.call(xAxis.scale(newXscale));
+    d3.select("#bars-group")
+      .selectAll("polyline")
+      .data(data)
+      .attr("points", d => genPoints(d, newXscale, yScale).coord);
+  };
+
+  const zoom = d3
+    .zoom()
+    .scaleExtent([1, Infinity])
+    .translateExtent([
+      [0, 0],
+      [width, height]
+    ])
+    .extent([
+      [0, 0],
+      [width, height]
+    ])
+    .on("zoom", zoomed);
+
+  svg.call(zoom);
 };
