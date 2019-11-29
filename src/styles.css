@@ -36,16 +36,26 @@
   font-size: 16px;
 }
 
-#tooltip {
+#popover {
   color: white;
   position: absolute;
   display: flex;
-  width: 80px;
-  height: 100px;
   padding: 10px;
+  opacity: 0;
   font: 12px sans-serif;
   background: rgba(0, 0, 0, 0.8);
-  border: 2px solid black;
-  border-radius: 4px;
+  border-top: 5px solid #000;
+  border-top: 5px solid hsla(0, 0%, 20%, 0.9);
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
   pointer-events: none;
+  transition: all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97);
+}
+
+#popover:hover {
+  cursor: pointer;
+}
+
+#popContainer {
+  position: absolute;
 }

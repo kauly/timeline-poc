@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 
 import { genViz } from "./Viz";
 import { cleanDate } from "./forReal";
+import Popover from "./Popover";
 import "./styles.css";
 
 const App = props => {
@@ -17,7 +18,7 @@ const App = props => {
   }, [data]);
 
   return (
-    <div className="container">
+    <div className="container" id="container">
       <div ref={containerRef} id="viz" />
     </div>
   );

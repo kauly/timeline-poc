@@ -1,6 +1,8 @@
 import * as d3 from "d3";
 import moment from "moment";
-
+import React from "react";
+import { render, createPortal } from "react-dom";
+import Popover from "./Popover";
 moment.locale("pt-br");
 
 const graphProps = {
@@ -60,7 +62,7 @@ export const genViz = data => {
     .select("#viz")
     .append("div")
     .style("opacity", 0)
-    .attr("id", "tooltip");
+    .attr("id", "popover");
   const svg = d3
     .select("#viz")
     .append("svg")
@@ -152,7 +154,7 @@ export const genViz = data => {
         )
         .style(
           "top",
-          `${this.getBoundingClientRect().top - yScale.bandwidth() * 2}px`
+          `${this.getBoundingClientRect().top - yScale.bandwidth()}px`
         )
         .style(
           "left",
@@ -190,4 +192,5 @@ export const genViz = data => {
     .on("zoom", zoomed);
 
   svg.call(zoom);
+  return null;
 };
