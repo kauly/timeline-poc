@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Box, Text, Button } from "rebass";
+import { Flex, Box, Text, Button } from "rebass/styled-components";
 import * as R from "ramda";
 
 const Popover = props => {

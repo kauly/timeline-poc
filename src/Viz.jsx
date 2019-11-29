@@ -1,8 +1,6 @@
 import * as d3 from "d3";
 import moment from "moment";
-import React from "react";
-import { render, createPortal } from "react-dom";
-import Popover from "./Popover";
+
 moment.locale("pt-br");
 
 const graphProps = {
