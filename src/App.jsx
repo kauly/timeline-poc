@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Flex, Box } from "rebass";
-import TimeViz from "./TimeViz";
+import TimeViz from "./Components/TimeViz";
 
-import { cleanData } from "./forReal";
-import "./styles.css";
+import { cleanData } from "./Components/assets/forReal";
 
 const App = () => {
   const [data, setData] = useState(null);
@@ -18,8 +17,8 @@ const App = () => {
     height: 500,
     padding: 50,
     legend: [
-      { label: "Em movimento", color: "#eb4d4b", type: "move" },
-      { label: "Parado com ingnição ligada", color: "#6ab04c", type: "weird" }
+      { label: "Em movimento", color: "#4876FF", type: "move" },
+      { label: "Parado com ingnição ligada", color: "#FF983D", type: "weird" }
     ]
   };
 
@@ -29,7 +28,7 @@ const App = () => {
       justifyContent="center"
       alignItems="center"
       height="100vh"
-      bg="primary"
+      bg="#fffff"
     >
       <Box
         bg="#ffff"

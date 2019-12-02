@@ -4,7 +4,10 @@ import { Flex } from "rebass";
 import { isNil, path, reduce } from "ramda";
 
 import Popover from "./Popover";
-import { begin, end, genPoints, daysOfWeek, toMoment } from "./forReal";
+import Legends from "./Legend";
+import { begin, end, genPoints, daysOfWeek, toMoment } from "./assets/forReal";
+
+import "./assets/styles.css";
 
 const TimeViz = ({ conf, data }) => {
   const vizRef = useRef();
@@ -29,16 +32,20 @@ const TimeViz = ({ conf, data }) => {
     setColorProps(colorHash);
   }, [conf]);
 
-  const { width, height, padding } = conf;
+  const { width, height } = conf;
+  const margins = { top: 40, left: 60, bottom: 20, right: 40 };
+  const innerHeight = height - margins.top - margins.bottom;
+  const innerWidth = width - margins.left - margins.right;
+
   const _xScale = d3
     .scaleTime()
     .domain([begin, end])
-    .range([padding, width - padding])
+    .range([0, innerWidth])
     .nice();
   const _yScale = d3
     .scaleBand()
     .domain(daysOfWeek)
-    .rangeRound([height - padding, padding])
+    .rangeRound([innerHeight, 0])
     .paddingInner(0.08);
 
   function dataOver(d) {
@@ -75,7 +82,16 @@ const TimeViz = ({ conf, data }) => {
   const zoomed = () => {
     const evTransform = d3.event.transform;
     const newXscale = evTransform.rescaleX(_xScale);
-    d3.select("#x-axis").call(_xAxis.scale(newXscale));
+    d3.select("#x-axis")
+      .call(_xAxis.scale(newXscale))
+      .call(g => g.select(".domain").remove())
+      .call(g =>
+        g
+          .selectAll(".tick line")
+          .attr("stroke", "#BBCBFC")
+          .attr("y2", margins.top + height * -1)
+      );
+
     d3.select("#bars-group")
       .selectAll("polyline")
       .data(data)
@@ -87,11 +103,11 @@ const TimeViz = ({ conf, data }) => {
     .scaleExtent([1, Infinity])
     .translateExtent([
       [0, 0],
-      [width, height]
+      [innerWidth, innerHeight]
     ])
     .extent([
       [0, 0],
-      [width, height]
+      [innerWidth, innerHeight]
     ])
     .on("zoom", zoomed);
 
@@ -106,37 +122,60 @@ const TimeViz = ({ conf, data }) => {
     const svg = d3
       .select(vizRef.current)
       .on("click", () => d3.select(popRef.current).style("opacity", 0));
-    svg
+
+    const mainG = svg
+      .append("g")
+      .attr("id", "main")
+      .attr("transform", `translate(${margins.left}, ${margins.top})`);
+    const clipPath = mainG
       .append("defs")
       .append("clipPath")
       .attr("id", "clip")
       .append("rect")
-      .attr("width", width - padding * 2)
+      .attr("width", innerWidth)
       .attr("x", _xScale.range()[0])
-      .attr("height", height - padding);
+      .attr("height", innerHeight)
+      .attr("fill", "#F2F5FF");
 
-    svg
+    const xG = mainG
       .append("g")
       .attr("id", "x-axis")
-      .attr("transform", `translate(0, ${height - padding})`)
-      .call(_xAxis);
+      .attr("class", "axis")
+      .attr("transform", `translate(0, ${innerHeight})`)
+      .call(_xAxis)
+      .call(g => g.select(".domain").remove())
+      .call(g =>
+        g
+          .selectAll(".tick line")
+          .attr("stroke", "#BBCBFC")
+          .attr("y2", margins.top + height * -1)
+      );
 
-    svg
+    const yG = mainG
       .append("g")
       .attr("id", "y-axis")
-      .attr("transform", `translate(${padding}, 0)`)
+      .attr("class", "axis")
       .call(_yAxis)
       .call(g => g.select(".domain").remove())
       .call(g =>
         g
           .selectAll(".tick line")
-          .attr("stroke-opacity", 0.5)
-          .attr("stroke-dasharray", "2,2")
-          .attr("x2", _xScale.range()[1] - padding)
+          .attr("stroke", "#BBCBFC")
+          .style("opacity", "0.25")
+          .attr("x2", innerWidth)
       )
-      .call(g => g.selectAll(".tick text").attr("dy", -4));
+      .call(g =>
+        g
+          .selectAll(".tick")
+          .append("line")
+          .attr("stroke", "#BBCBFC")
+          .attr("x1", -8)
+      )
+      .call(g =>
+        g.selectAll(".tick text").attr("dy", _yScale.bandwidth() * 0.5 * -1)
+      );
 
-    svg
+    const barsG = mainG
       .append("g")
       .attr("id", "bars-group")
       .attr("clip-path", "url(#clip)")
@@ -149,24 +188,13 @@ const TimeViz = ({ conf, data }) => {
       .on("mouseover", dataOver)
       .on("mouseout", dateOut);
 
-    /*     svg
-      .append("g")
-      .attr("id", "legend-group")
-      .selectAll("circle")
-      .data(conf.legend)
-      .enter()
-      .append("circle")
-      .attr("cy", height - 10)
-      .attr("cx", (d, i) => _xScale.range()[1] * 0.5)
-      .attr("r", 10)
-      .attr("fill", d => d.color); */
-
     svg.call(zoom);
   };
   return (
     <Flex flexDirection="column">
       <svg id="viz" width={width} height={height} ref={vizRef} />
       <Popover ref={popRef} data={popProps} />
+      {!isNil(conf.legend) && <Legends conf={conf.legend} />}
     </Flex>
   );
 };
