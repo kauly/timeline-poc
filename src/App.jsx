@@ -1,26 +1,33 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { Flex } from "rebass";
+import TimeViz from "./TimeViz";
 
-import { genViz } from "./Viz";
-import { cleanDate } from "./forReal";
-import Popover from "./Popover";
+import { cleanData } from "./forReal";
 import "./styles.css";
 
-const App = props => {
+const App = () => {
   const [data, setData] = useState(null);
-  const containerRef = useRef();
 
   useEffect(() => {
-    setData(cleanDate());
+    const d = cleanData();
+    setData(d);
   }, []);
 
-  useEffect(() => {
-    data && genViz(data);
-  }, [data]);
+  const dimensions = {
+    width: 1000,
+    height: 500,
+    padding: 50
+  };
 
   return (
-    <div className="container" id="container">
-      <div ref={containerRef} id="viz" />
-    </div>
+    <Flex
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+      height="100vh"
+    >
+      <TimeViz data={data} dimensions={dimensions} />
+    </Flex>
   );
 };
 

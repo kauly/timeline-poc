@@ -1,6 +1,6 @@
 import * as R from "ramda";
 import * as moment from "moment";
-
+moment.locale("pt-BR");
 import { data } from "./trips";
 
 const iWanna = [
@@ -14,6 +14,8 @@ const iWanna = [
   "total_distance"
 ];
 const dateFormat = "YYYY-MM-DD hh:mm:ss";
+const timeFormat = "hh:mm:ss";
+export const toMoment = date => moment(date).format(timeFormat);
 export const types = ["weird", "move", "stop"];
 export const colors = ["#eb4d4b", "#6ab04c", "#f0932b"];
 export const daysOfWeek = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
@@ -26,6 +28,7 @@ export const resetTime = d =>
 
 export const begin = moment("02/08/1987", "DD/MM/YYYY").startOf("day");
 export const end = moment("02/08/1987", "DD/MM/YYYY").endOf("day");
+
 export const genPoints = (d, scaleX, scaleY) => {
   const x_1 = scaleX(resetTime(d.begin_at));
   const x_2 = scaleX(resetTime(d.end_at));
@@ -39,6 +42,7 @@ export const genPoints = (d, scaleX, scaleY) => {
     p_4: `${x_1},${y_2}`,
     p_5: `${x_1},${y_1}`
   };
+
   return {
     points,
     coord: `${points.p_1} ${points.p_2} ${points.p_3} ${points.p_4} ${points.p_5}`
@@ -55,5 +59,5 @@ const itemWDate = data => ({
   type: types[randomType()]
 });
 
-export const cleanDate = () =>
+export const cleanData = () =>
   R.pipe(R.map(item), R.map(itemWDate))(data.trips);
