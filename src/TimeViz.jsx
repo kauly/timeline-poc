@@ -1,32 +1,35 @@
 import * as d3 from "d3";
 import React, { useEffect, useState, useRef } from "react";
 import { Flex } from "rebass";
-import { isNil } from "ramda";
+import { isNil, path, reduce } from "ramda";
 
 import Popover from "./Popover";
-import {
-  begin,
-  end,
-  genPoints,
-  daysOfWeek,
-  types,
-  colors,
-  toMoment
-} from "./forReal";
+import { begin, end, genPoints, daysOfWeek, toMoment } from "./forReal";
 
-const TimeViz = ({ dimensions, data }) => {
+const TimeViz = ({ conf, data }) => {
   const vizRef = useRef();
   const popRef = useRef();
   const loading = useState(false);
   const [popProps, setPopProps] = useState();
+  const [colorProps, setColorProps] = useState(0);
 
   useEffect(() => {
-    if (!isNil(data) && !isNil(vizRef.current)) {
-      genViz();
-    }
+    if (isNil(data) || isNil(vizRef.current) || isNil(colorProps)) return;
+
+    genViz();
   }, [data]);
 
-  const { width, height, padding } = dimensions;
+  useEffect(() => {
+    if (isNil(conf)) return;
+    const colorHash = reduce(
+      (acc, elem) => ({ ...acc, [elem.type]: elem }),
+      {},
+      conf.legend
+    );
+    setColorProps(colorHash);
+  }, [conf]);
+
+  const { width, height, padding } = conf;
   const _xScale = d3
     .scaleTime()
     .domain([begin, end])
@@ -37,11 +40,6 @@ const TimeViz = ({ dimensions, data }) => {
     .domain(daysOfWeek)
     .rangeRound([height - padding, padding])
     .paddingInner(0.08);
-
-  const _colorScale = d3
-    .scaleOrdinal()
-    .domain(types)
-    .range(colors);
 
   function dataOver(d) {
     const popTop = popRef.current.offsetHeight;
@@ -60,6 +58,7 @@ const TimeViz = ({ dimensions, data }) => {
           this.getBoundingClientRect().width}px`
       );
     setPopProps({
+      ...popProps,
       start: toMoment(d.begin_at),
       end: toMoment(d.end_at),
       distance: d.total_distance,
@@ -98,13 +97,15 @@ const TimeViz = ({ dimensions, data }) => {
 
   const _xAxis = d3.axisBottom(_xScale).tickFormat(d3.timeFormat("%H:%M"));
   const _yAxis = d3.axisLeft(_yScale).ticks(8);
-  const _colorAcc = d => _colorScale(d.type);
+  const _colorAcc = d => {
+    console.log(path([d.type, "color"], colorProps), colorProps);
+    return path([d.type, "color"], colorProps);
+  };
 
   const genViz = () => {
     const svg = d3
       .select(vizRef.current)
       .on("click", () => d3.select(popRef.current).style("opacity", 0));
-    console.log("TCL: genViz -> svg", data);
     svg
       .append("defs")
       .append("clipPath")
@@ -147,6 +148,18 @@ const TimeViz = ({ dimensions, data }) => {
       .attr("fill", _colorAcc)
       .on("mouseover", dataOver)
       .on("mouseout", dateOut);
+
+    /*     svg
+      .append("g")
+      .attr("id", "legend-group")
+      .selectAll("circle")
+      .data(conf.legend)
+      .enter()
+      .append("circle")
+      .attr("cy", height - 10)
+      .attr("cx", (d, i) => _xScale.range()[1] * 0.5)
+      .attr("r", 10)
+      .attr("fill", d => d.color); */
 
     svg.call(zoom);
   };

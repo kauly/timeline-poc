@@ -4,12 +4,6 @@
   box-sizing: border-box;
 }
 
-#viz {
-  background-color: white;
-  padding: 10px;
-  border-radius: 10px;
-}
-
 #x-axis path .x-axis line {
   shape-rendering: crispEdges;
 }

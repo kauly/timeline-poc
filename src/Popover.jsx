@@ -16,8 +16,8 @@ const Popover = forwardRef((props, ref) => {
         opacity: 0,
         fontSize: 12,
         background: "rgba(0, 0, 0, 0.8)",
-        borderTop: "5px solid hsla(0, 0%, 20%, 0.9)",
-        transition: "all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97)"
+        transition: "all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97)",
+        borderRadius: 4
       }}
     >
       <Box width={1 / 1}>

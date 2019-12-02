@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Flex } from "rebass";
+import { Flex, Box } from "rebass";
 import TimeViz from "./TimeViz";
 
 import { cleanData } from "./forReal";
@@ -13,10 +13,14 @@ const App = () => {
     setData(d);
   }, []);
 
-  const dimensions = {
+  const timeConf = {
     width: 1000,
     height: 500,
-    padding: 50
+    padding: 50,
+    legend: [
+      { label: "Em movimento", color: "#eb4d4b", type: "move" },
+      { label: "Parado com ingnição ligada", color: "#6ab04c", type: "weird" }
+    ]
   };
 
   return (
@@ -25,8 +29,16 @@ const App = () => {
       justifyContent="center"
       alignItems="center"
       height="100vh"
+      bg="primary"
     >
-      <TimeViz data={data} dimensions={dimensions} />
+      <Box
+        bg="#ffff"
+        sx={{
+          borderRadius: 4
+        }}
+      >
+        <TimeViz data={data} conf={timeConf} />
+      </Box>
     </Flex>
   );
 };

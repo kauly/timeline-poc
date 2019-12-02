@@ -16,7 +16,7 @@ const iWanna = [
 const dateFormat = "YYYY-MM-DD hh:mm:ss";
 const timeFormat = "hh:mm:ss";
 export const toMoment = date => moment(date).format(timeFormat);
-export const types = ["weird", "move", "stop"];
+export const types = ["weird", "move"];
 export const colors = ["#eb4d4b", "#6ab04c", "#f0932b"];
 export const daysOfWeek = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 export const resetTime = d =>
@@ -49,7 +49,7 @@ export const genPoints = (d, scaleX, scaleY) => {
   };
 };
 
-const randomType = () => Math.round(Math.random() * 2);
+const randomType = () => Math.round(Math.random() * 1);
 const toDateObj = date => moment(date, dateFormat).toDate();
 const item = R.pick(iWanna);
 const itemWDate = data => ({
