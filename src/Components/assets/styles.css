@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css?family=Nunito");
+
 .axis {
   shape-rendering: crispEdges;
 }
@@ -5,6 +7,6 @@
 .axis,
 text {
   font-size: 16px;
-  font-family: "sans-serif, Nunito";
+  font-family: "Nunito";
   color: #8d9bb0;
 }
