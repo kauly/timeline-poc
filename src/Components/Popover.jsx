@@ -14,20 +14,16 @@ const Popover = forwardRef((props, ref) => {
         position: "absolute",
         padding: 10,
         opacity: 0,
-        fontSize: 12,
-        background: "rgba(0, 0, 0, 0.8)",
+        fontFamily: "Nunito",
+        background: "#283445",
+        boxShadow: "1px 4px 2px rgba(40, 52, 69, 0.25)",
         transition: "all 0.5s cubic-bezier(0.75, -0.02, 0.2, 0.97)",
         borderRadius: 4
       }}
     >
-      <Box width={1 / 1}>
-        <Text fontWeight="bold">{R.pathOr("", ["title"], props.data)}</Text>
-      </Box>
       <Box width={1 / 1} py="5px">
         <Flex>
-          <Text fontWeight="bold" mr={"4px"}>
-            Começo:
-          </Text>
+          <Text sx={{}}>início</Text>
           <Text>{R.pathOr("", ["start"], props.data)}</Text>
         </Flex>
       </Box>

@@ -9,10 +9,19 @@ const LegendItem = item => (
         height: 10,
         backgroundColor: item.color,
         borderRadius: "50%",
-        marginRight: "5px"
+        marginRight: "8px"
       }}
     ></Box>
-    <Text mr={20}>{item.label}</Text>
+    <Text
+      mr={20}
+      sx={{
+        fontFamily: "Nunito",
+        fontSize: 14,
+        color: "#657286"
+      }}
+    >
+      {item.label}
+    </Text>
   </Flex>
 );
 
