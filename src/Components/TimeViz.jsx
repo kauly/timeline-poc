@@ -113,10 +113,7 @@ const TimeViz = ({ conf, data }) => {
 
   const _xAxis = d3.axisBottom(_xScale).tickFormat(d3.timeFormat("%H:%M"));
   const _yAxis = d3.axisLeft(_yScale).ticks(8);
-  const _colorAcc = d => {
-    console.log(path([d.type, "color"], colorProps), colorProps);
-    return path([d.type, "color"], colorProps);
-  };
+  const _colorAcc = d => path([d.type, "color"], colorProps);
 
   const genViz = () => {
     const svg = d3
